@@ -1,3 +1,17 @@
-version: "3"
+version: '3'
+services:
+  web:
+    build: ./web
+    ports:
+      - "5001:5000"
+    env_file:
+      - tripmeal.env
+    depends_on:
+      - db
 
-# COMPLETE THIS FILE
+  db:
+    build: ./db
+    ports:
+      - "3306:3306"
+    env_file:
+      - tripmeal.env

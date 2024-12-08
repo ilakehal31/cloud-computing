@@ -1,50 +1,47 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: web-service
 spec:
   type: LoadBalancer
   ports:
-  - port: 5000
+  - port: 5001
     targetPort: 5000
     protocol: TCP
   selector:
-    app: tripmeal
-    service: web
+    app: web
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: web-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tripmeal
-      service: web
+      app: web
   template:
     metadata:
       labels:
-        app: tripmeal
-        service: web
+        app: web
     spec:
       containers:
-      - image: #ADD NAME OF YOUR IMAGE
-        name: web
+      - name: web
+        image: europe-west2-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${APP_NAME}-web:${APP_VERSION}
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
-          protocol: TCP
         env:
         - name: DATABASE_NAME
           value: "tripmealdb"
         - name: DATABASE_USER
           value: "root"
-        - name: MYSQL_ROOT_PASSWORD
-          value: "my-secret-pw"
         - name: DATABASE_HOST
-          value: "db"
+          value: "db-service"
         - name: DATABASE_PORT
           value: "3306"
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
         - name: TRIPMEAL_KEY
           value: "my-secret-key"
         - name: SERVER_PORT
@@ -53,47 +50,41 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: db
+  name: db-service
 spec:
   type: ClusterIP
   ports:
   - port: 3306
     protocol: TCP
   selector:
-    app: tripmeal
-    service: db
+    app: db
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: db
+  name: db-statefulset
 spec:
+  serviceName: db-service
+  replicas: 1
   selector:
     matchLabels:
-      app: tripmeal
-      service: db
-  serviceName: db
+      app: db
   template:
     metadata:
       labels:
-        app: tripmeal
-        service: db
+        app: db
     spec:
       containers:
-      - image: #ADD NAME OF YOUR IMAGE
-        name: db
+      - name: db
+        image: europe-west2-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${APP_NAME}-db:${APP_VERSION}
+        imagePullPolicy: Never
         ports:
         - containerPort: 3306
-        volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: tripmeal-data
         env:
-        - name: DATABASE_NAME
+        - name: MYSQL_DATABASE
           value: "tripmealdb"
-        - name: DATABASE_USER
-          value: "root" 
         - name: MYSQL_ROOT_PASSWORD
-          value: "my-secret-pw"
+          value: "root"
   volumeClaimTemplates:
   - metadata:
       name: tripmeal-data
