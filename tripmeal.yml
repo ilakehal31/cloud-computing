@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: europe-west2-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${APP_NAME}-web:${APP_VERSION}
+        image: europe-west2-docker.pkg.dev/gq-cloud-computing/tripmeal-ilakehal-repo/tripmeal-web:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
@@ -76,7 +76,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: europe-west2-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${APP_NAME}-db:${APP_VERSION}
+        image: europe-west2-docker.pkg.dev/gq-cloud-computing/tripmeal-ilakehal-repo/tripmeal-db:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 3306
